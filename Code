@@ -1,0 +1,29 @@
+# Load the minet package
+library(minet)
+
+# Load a sample dataset (gene expression data)
+data(gimme)
+
+# Preprocess the data (remove missing values and normalize the data)
+gimme.norm &lt;- preprocess(gimme, method=&quot;zscore&quot;, na.rm=TRUE)
+
+# Compute mutual information between pairs of variables
+mi &lt;- build.mim(gimme.norm)
+
+# Construct a network using the MRMR algorithm
+mrnet &lt;- mrnet(mi, algorithm=&quot;mim&quot;, score=&quot;mim&quot;, ntree=10, nfeat=30)
+
+# Plot the resulting network
+plot(mrnet)
+
+# Perform statistical inference on the network
+netstats &lt;- minet.stats(mrnet, mi, B=1000)
+
+# Get the p-values for each edge in the network
+pvals &lt;- get.pval(netstats)
+
+# Identify significant edges using a significance threshold (e.g. p &lt; 0.05)
+sig.edges &lt;- which(pvals &lt; 0.05)
+
+# Print the significant edges
+print(sig.edges)
